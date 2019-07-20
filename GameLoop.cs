@@ -13,7 +13,19 @@ namespace BlackJack
        game data and change state. */
     static void Main(string[] args)
     {
+      Console.OutputEncoding = System.Text.Encoding.UTF8;
+      StartGame();
+    }
 
+    private void StartGame() {
+      // Set up the game
+    }
+
+    private void CheckState() {
+      // Check for end game scenario
+    }
+    private void GameOver() {
+      // Put a bow on it and wrap it up
     }
   }
 }

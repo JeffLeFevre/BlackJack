@@ -11,17 +11,19 @@ namespace BlackJack
     /* The purpose of this class is to instantiate
        and track data related to game state. */
 
-    private List<Card> _deck; 
+    private List<Card> _deck;
+    private List<Player> _players; 
     public void GameData(){
       // Instantiate the deck
-      this.Shuffle();
+      _deck = new List<Card>();
+      Shuffle();
       // Instantiate dealer
       // Instantiate player
-      this.Deal();
+      Deal();
     }
 
     private void Shuffle() {
-      _deck = new List<Card>{};
+      
     }
 
     private void Deal() {
