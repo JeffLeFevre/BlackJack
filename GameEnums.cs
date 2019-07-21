@@ -1,18 +1,17 @@
 namespace BlackJack
 {
-    /* Concatenating strings from suits + values gives
+    /* Concatenating strings from suits + cards gives
        the full unicode code to draw the correct graphic. */ 
     public enum SuitUnicodeValues
     {
-      Diamonds = "U+1F0C",
-      Spades = "U+1F0A",
-      Hearts = "U+1F0B",
-      Clubs = "U+1F0D"
+      Diamonds = "\u1F0C",
+      Spades = "\u1F0A",
+      Hearts = "\u1F0B",
+      Clubs = "\u1F0D"
     };
 
     public enum CardUnicodeValues
     {
-      Back = "U+1F0A0",
       Ace = "1",
       Two = "2",
       Three = "3",
@@ -52,4 +51,21 @@ namespace BlackJack
       Hearts = "Hearts",
       Clubs = "Clubs"
     };
+
+    public enum CardPointValues
+    {
+        Win = 21,
+        Ace = 0,
+        Two = 2,
+        Three = 3,
+        Four = 4,
+        Five = 5,
+        Six = 6,
+        Seven = 7,
+        Eight = 8,
+        Nine = 9,
+        Jack = 10,
+        Queen = 10,
+        King = 10
+    }
 }
