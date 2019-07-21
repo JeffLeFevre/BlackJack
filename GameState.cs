@@ -35,10 +35,10 @@ namespace BlackJack
     }
 
     private void CreateDeck() {
-      foreach (var suit in SuitNames) {
+      foreach (var suitName in SuitNames) {
         foreach (var cardName in CardNames) {
-          var cardTitle = suit + cardName;
-          var cardUnicode = SuitUnicodeValues[suit] + CardUnicodeValues[cardName];
+          var cardTitle = cardName + suitName;
+          var cardUnicode = SuitUnicodeValues[suitName] + CardUnicodeValues[cardName];
           _deck.Add(
             new Card(cardTitle, cardUnicode, CardPointValues[cardName])
           );
@@ -50,6 +50,28 @@ namespace BlackJack
       int cardNum = draw.Next(_deck.Count);
       drawnCard = _deck[cardNum];
       _deck.Remove(card => card.cardName == drawnCard.cardName);
+    }
+
+    public void NextRound() {
+      DealRound();
+      DisplayRound();
+      CheckAndSetGameOver();
+    }
+    private void DealRound() {
+      var firstPlayerToHit = _players.Where( p => p.dealer != true).First();
+      var dealer = _players.Where( p => p.dealer == true);
+      DrawFromDeck();
+      firstPlayerToHit.Hit(drawnCard);
+      DrawFromDeck();
+      dealer.Hit(drawnCard);
+    }
+
+    private void DisplayRound() {
+      Console.Clear();
+      // Draw Dealer's hand + points
+      // Draw betting pool
+      // Draw Player's hand + points
+      // Draw player's current bet + chips left
     }
 
     private void CheckAndSetGameOver() {
@@ -76,14 +98,10 @@ namespace BlackJack
       }
     }
 
-    public void NextGame() {
+    public void NewGame() {
       gameOver = false;
       _deck = new List<Card>();
       CreateDeck();
-      foreach(Player p in _players) {
-        DrawFromDeck();
-        p.Hit(drawnCard);
-      }
     }
   }
 }

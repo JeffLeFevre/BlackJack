@@ -77,8 +77,9 @@ namespace BlackJack
 
     private void PlayGame() {
       while (!state.gameOver) {
-        
+        state.NextRound();
       }
+      GameOver();
     }
     private void GameOver() {
       Console.Clear();
@@ -86,7 +87,7 @@ namespace BlackJack
       validSelections = new List<char> { 'n', 'N', 'y', 'Y' };
       GetUserInput(validSelections);
       if(_selection == 'y' || 'Y') {
-        state.NextGame();
+        state.NewGame();
         PlayGame();
       }
     }
