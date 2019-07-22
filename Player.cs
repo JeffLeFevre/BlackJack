@@ -1,52 +1,54 @@
 namespace BlackJack {
     class Player {
-        public bool dealer { get; private set; }
         public bool blackJack { get; private set; }
         public bool bust { get; private set; }
+        public bool stand { get; private set; }
+        public string name { get; private set; }
         private List<Card> _hand;
+        private Card _currentCard;
         private int _handPointValue;
-        public int chips { get; private set; }
+        private int _chips;
 
         public int currentBet { get; private set; }
 
         private int _wins = 0;
 
-        public void Player(bool isDealer, Card initialCardDealt, int startingChipsValue) {
-            dealer = isDealer;
+        public void Player(int startingChipsValue, string playerName) {
             blackJack = false;
             bust = false;
+            stand = false;
+            name = playerName;
             _hand = new List<Card>();
-            _hand.Add(initialCardDealt);
-            _handPointValue = initialCardDealt.pointVal;
-            chips = startingChipsValue;
+            _chips = startingChipsValue;
             currentBet = 0;
         }
 
-        public int Bet(int betValue) {
+        public void Bet(int betValue) {
             currentBet = betValue;
-            if (chips <= 0) {
+            if (_chips <= 0) {
                 currentBet = 0;
-                return currentBet;
+                bust = true;
+                Console.WriteLine(name + " is out of chips.");
+                return;
             }
-            if (betValue >= chips) {
-                currentBet = chips;
+            if (betValue >= _chips) {
+                currentBet = _chips;
             }
-            chips -= currentBet;
-            return currentBet;
+            _chips -= currentBet;
         }
         public void Hit(Card dealtCard) {
+            _currentCard = dealtCard;
             _hand.Add(dealtCard);
             _handPointValue += dealtCard.pointVal;
             AdjustForAcesAndCheckPoints();
         }
 
-        public string ShowHand() {
-            string playerHand;
+        public void ShowHand() {
+            Console.Write(name + "'s current hand: ");
             foreach(Card playerCard in _hand) {
-                playerHand += playerCard.unicodeVal + " ";
+                playerCard.ShowFace();
             }
-            playerHand += "\n";
-            return playerHand;
+            Console.WriteLine();
         }
 
         private void AdjustForAcesAndCheckPoints() {
@@ -65,19 +67,19 @@ namespace BlackJack {
         }
 
         private void CheckAndSetBust() {
-            if (_handPointValue > CardPointValues.Win) {
+            if (_handPointValue > CardPointValues.BlackJack) {
                 bust = true;
             }
         }
 
         private void CheckAndSetBlackJack() {
-            if (_handPointValue == CardPointValues.Win) {
+            if (_handPointValue == CardPointValues.BlackJack) {
                 blackJack = true;
             }
         }
 
         private void Win(int chipsWon) {
-            chips += chipsWon;
+            _chips += chipsWon;
             _wins++;
         }
     }

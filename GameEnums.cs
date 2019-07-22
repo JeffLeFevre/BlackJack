@@ -54,7 +54,7 @@ namespace BlackJack
 
     public enum CardPointValues
     {
-        Win = 21,
+        BlackJack = 21,
         Ace = 0,
         Two = 2,
         Three = 3,

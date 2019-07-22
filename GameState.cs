@@ -10,98 +10,90 @@ namespace BlackJack
   {
     /* The purpose of this class is to instantiate
        and track data related to game state. */
-    private Random draw = new Random();
-    private List<Card> _deck;
-    public Card drawnCard;
+    private string[] _playerNames;
+    private Deck _deck;
     private List<Player> _players;
+    private Player _currentPlayer;
+    public Player dealer { get; private set; }
 
     public int chipBettingPool { get; private set; }
+    public List<string> winningPlayerNames { get; private set; }
 
     public bool gameOver { get; private set; }
 
-    public void GameState(int playerStartingChipValue){
-      gameOver = false;
-      _deck = new List<Card>();
-      CreateDeck();
-      // According to rules, player gets first draw.
-      DrawFromDeck();
-      _players.Add(
-        new Player(false, drawnCard, playerStartingChipValue)
-      );
-      DrawFromDeck();
-      _players.Add(
-        new Player(true, drawnCard, 0)
-      );
+    public void GameState(int playerStartingChipValue, string[] playerNames){
+      _playerNames = playerNames;
+      _players = new List<Player>();
+      foreach(string name in _playerNames) {
+        _players.Add(
+          new Player(playerStartingChipValue, name)
+        );
+      }
+      NewGame();
     }
 
-    private void CreateDeck() {
-      foreach (var suitName in SuitNames) {
-        foreach (var cardName in CardNames) {
-          var cardTitle = cardName + suitName;
-          var cardUnicode = SuitUnicodeValues[suitName] + CardUnicodeValues[cardName];
-          _deck.Add(
-            new Card(cardTitle, cardUnicode, CardPointValues[cardName])
-          );
-        }
+    private void HitPlayer(Player playerToHit, int numCardsToDeal = 1) {
+      for(int i = 0; i < numCardsToDeal; i++) {
+        playerToHit.Hit(_deck.Draw());
       }
     }
-
-    private void DrawFromDeck() {
-      int cardNum = draw.Next(_deck.Count);
-      drawnCard = _deck[cardNum];
-      _deck.Remove(card => card.cardName == drawnCard.cardName);
+    private void FirstDeal() {
+      foreach(Player p in _players) {
+        // First round each player is dealt two cards
+        _currentPlayer = p;
+        HitPlayer(p, 2);
+      }
+      HitPlayer(dealer, 2);
     }
-
-    public void NextRound() {
-      DealRound();
-      DisplayRound();
-      CheckAndSetGameOver();
+    private void AddPlayerBetToPool(int betAmount) {
+      _currentPlayer.Bet(betAmount);
+      chipBettingPool += _currentPlayer.currentBet;
     }
     private void DealRound() {
-      var firstPlayerToHit = _players.Where( p => p.dealer != true).First();
-      var dealer = _players.Where( p => p.dealer == true);
-      DrawFromDeck();
-      firstPlayerToHit.Hit(drawnCard);
-      DrawFromDeck();
-      dealer.Hit(drawnCard);
-    }
-
-    private void DisplayRound() {
-      Console.Clear();
-      // Draw Dealer's hand + points
-      // Draw betting pool
-      // Draw Player's hand + points
-      // Draw player's current bet + chips left
-    }
-
-    private void CheckAndSetGameOver() {
       foreach(Player p in _players) {
-        if(p.bust) {
-          if(p.dealer) {
-            Console.WriteLine("Dealer Busts!");
-          } else {
-            Console.WriteLine("Player Busts!");
-          }
-          if(p.chips <= 0 && !p.dealer) {
-            Console.WriteLine("You're out of Chips...Game Over!");
-          }
+        _currentPlayer = p;
+        if(!p.stand) {
+          HitPlayer(p);
         }
-        if(p.blackJack) {
-          if(p.dealer) {
-            Console.WriteLine("Dealer has Black Jack!");
-            p.Win(chipBettingPool);
-          }
-          Console.WriteLine("Black Jack! You Win!");
-          p.Win(chipBettingPool);
-        }
-        gameOver = true;
       }
+      HitPlayer(dealer);
+    }
+
+    private void CheckWinState() {
+      if(dealer.blackJack) {
+        PlayerWins(dealer, chipBettingPool);
+        return;
+      }
+      if(dealer.bust) {
+        return;
+      }
+      var winners = _players.Where(p => p.blackJack == true);
+      if(winners != null) {
+        SplitWinnings(winners);
+        return;
+      }
+    }
+
+    private void SplitWinnings(List<Player> winnerList) {
+      // Round down in case the pool doesn't divide evenly.
+      // Anything left is lost to the annals of time and tragedy.
+      int chipsWonPerPlayer = Convert.ToInt32(Math.Floor(chipBettingPool/winnerList.Count()));
+      foreach(Player winner in winnerList) {
+        PlayerWins(winner, chipsWonPerPlayer);
+      }
+    }
+
+    private void PlayerWins(Player winner, int amountOfChipsWon) {
+      gameOver = true;
+      winner.Win(amountOfChipsWon);
+      winningPlayerNames.Add(winner.name);
     }
 
     public void NewGame() {
       gameOver = false;
-      _deck = new List<Card>();
-      CreateDeck();
+      winningPlayerNames = new List<string>();
+      _deck = new Deck();
+      FirstDeal();
     }
   }
 }
