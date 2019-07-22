@@ -28,7 +28,6 @@ namespace BlackJack {
             if (_chips <= 0) {
                 currentBet = 0;
                 bust = true;
-                Console.WriteLine(name + " is out of chips.");
                 return;
             }
             if (betValue >= _chips) {
@@ -44,11 +43,9 @@ namespace BlackJack {
         }
 
         public void ShowHand() {
-            Console.Write(name + "'s current hand: ");
             foreach(Card playerCard in _hand) {
                 playerCard.ShowFace();
             }
-            Console.WriteLine();
         }
 
         private void AdjustForAcesAndCheckPoints() {
